@@ -3,41 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <title>Image Expression Identification with YOLOv8</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
 
-<div class="container mx-auto mt-10">
+<div class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
     <div class="text-center">
-        <h1 class="text-4xl font-bold mb-5">Image Expression Identification with YOLOv8</h1>
-        <form method="post" enctype="multipart/form-data">
+        <h1 class="text-5xl font-bold mb-5 text-indigo-600">Image Expression Identification with YOLOv8</h1>
+        <form id="uploadForm" method="post" enctype="multipart/form-data" class="bg-gray-50 p-5 rounded-lg shadow-md">
             <div class="mb-4">
-                <input type="file" name="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                <input type="file" name="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
             </div>
-            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Upload and Process</button>
+            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition duration-300">Upload and Process</button>
         </form>
+        <div id="loader" class="loader mx-auto mt-5"></div>
 
         {% if original_image %}
-        <div class="mt-10">
-            <h2 class="text-2xl font-semibold mb-5">Results</h2>
-            <div class="flex justify-center">
-                <div class="mr-5">
+        <div class="mt-10 animate-fade-in">
+            <h2 class="text-3xl font-semibold mb-5 text-indigo-700">Results</h2>
+            <div class="flex justify-center space-x-5">
+                <div class="flex flex-col items-center">
                     <h3 class="text-xl font-semibold mb-2">Original Image</h3>
-                    <img src="{{ original_image }}" class="rounded-lg shadow-lg">
+                    <img src="{{ original_image }}" class="rounded-lg shadow-lg w-64 h-64 object-cover">
                 </div>
-                <div>
+                {% if enhanced_image %}
+                <div class="flex flex-col items-center">
+                    <h3 class="text-xl font-semibold mb-2">Enhanced Image</h3>
+                    <img src="{{ enhanced_image }}" class="rounded-lg shadow-lg w-64 h-64 object-cover">
+                </div>
+                {% endif %}
+                <div class="flex flex-col items-center">
                     <h3 class="text-xl font-semibold mb-2">Processed Image</h3>
-                    <img src="{{ processed_image }}" class="rounded-lg shadow-lg">
+                    <img src="{{ processed_image }}" class="rounded-lg shadow-lg w-64 h-64 object-cover">
                 </div>
             </div>
             {% if expression %}
-            <div class="mt-5 text-xl">
-                <p>Expression: <span class="font-bold">{{ expression }}</span></p>
-                <p>Confidence: <span class="font-bold">{{ confidence }}</span></p>
+            <div class="mt-5 text-xl text-center">
+                <p class="text-gray-800">Expression: <span class="font-bold text-indigo-600">{{ expression }}</span></p>
+                <p class="text-gray-800">Confidence: <span class="font-bold text-indigo-600">{{ confidence }}</span></p>
             </div>
             {% else %}
-            <div class="mt-5 text-xl text-red-500">
+            <div class="mt-5 text-xl text-center text-red-500">
                 <p>No expressions detected.</p>
             </div>
             {% endif %}
@@ -45,6 +89,12 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        document.getElementById('loader').style.display = 'block';
+    });
+</script>
 
 </body>
 </html>

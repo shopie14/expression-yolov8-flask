@@ -9,6 +9,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = './static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Ensure the upload folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 # Load YOLO model
 model = YOLO("Yolov8l.pt")
 class_names = model.names
@@ -54,21 +58,26 @@ def index():
             # Check brightness and enhance if necessary
             mean_brightness = np.mean(cv2.cvtColor(image, cv2.COLOR_BGR2HSV)[:,:,2])
             enhanced_image = None
+            enhancement_needed = False
             if mean_brightness < 100:
                 enhanced_image = enhance_image(image.copy())
+                enhancement_needed = True
 
             # Identify expression
-            if enhanced_image is not None:
-                image_to_use = enhanced_image
-            else:
-                image_to_use = image
-
+            image_to_use = enhanced_image if enhanced_image is not None else image
             processed_image, expression, confidence = identify_expression(image_to_use, model)
             processed_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'processed_' + file.filename)
             cv2.imwrite(processed_filename, processed_image)
 
-            return render_template('index.html', original_image=url_for('static', filename='uploads/' + file.filename), processed_image=url_for('static', filename='uploads/processed_' + file.filename), expression=expression, confidence=confidence)
+            return render_template(
+                'index.html',
+                original_image=url_for('static', filename='uploads/' + file.filename),
+                enhanced_image=url_for('static', filename='uploads/' + file.filename) if enhancement_needed else None,
+                processed_image=url_for('static', filename='uploads/processed_' + file.filename),
+                expression=expression,
+                confidence=confidence
+            )
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=False)  # Ensure debug is set to False
+    app.run(debug=False)
