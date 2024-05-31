@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Expression Identification with YOLOv8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+<div class="container mx-auto mt-10">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-5">Image Expression Identification with YOLOv8</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-4">
+                <input type="file" name="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            </div>
+            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Upload and Process</button>
+        </form>
+
+        {% if original_image %}
+        <div class="mt-10">
+            <h2 class="text-2xl font-semibold mb-5">Results</h2>
+            <div class="flex justify-center">
+                <div class="mr-5">
+                    <h3 class="text-xl font-semibold mb-2">Original Image</h3>
+                    <img src="{{ original_image }}" class="rounded-lg shadow-lg">
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Processed Image</h3>
+                    <img src="{{ processed_image }}" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+            {% if expression %}
+            <div class="mt-5 text-xl">
+                <p>Expression: <span class="font-bold">{{ expression }}</span></p>
+                <p>Confidence: <span class="font-bold">{{ confidence }}</span></p>
+            </div>
+            {% else %}
+            <div class="mt-5 text-xl text-red-500">
+                <p>No expressions detected.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
