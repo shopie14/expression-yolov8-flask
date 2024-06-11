@@ -14,7 +14,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 # Load YOLO model
-model = YOLO("Yolov8l.pt")
+model = YOLO("yolov8_2.pt")
 class_names = model.names
 
 # Function to enhance dark images
